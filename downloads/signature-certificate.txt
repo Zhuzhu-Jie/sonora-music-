@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=Sonora Offline Music, OU=Independent Build
+Signer #1 certificate SHA-256 digest: e1fbe73a8e8fa41b0c06c03d1b94db54a642e962049aab50852fca0526c7834b
+Signer #1 certificate SHA-1 digest: 6f77a634539258177fa3f5a9bddbf2131a17d5e6
+Signer #1 certificate MD5 digest: c2812fcddfb2d8ec8e1b758f3278f1eb
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 3072
+Signer #1 public key SHA-256 digest: d319bd626de38e883faf4254191c164ace604fcfd1597f97dee5d1d9b229bf8e
+Signer #1 public key SHA-1 digest: d733ca594367b64f536fcdbb6b79d63ae8fde42d
+Signer #1 public key MD5 digest: 332e3b551a5b770906d40d55dcabf84f

@@ -1,8 +1,8 @@
 # 听见 · SONORA 1.0.0
 
-**安装包下载：[打开 v1.0.0 测试版发布页](https://github.com/Zhuzhu-Jie/sonora-music/releases/tag/v1.0.0)**
+**[下载安卓 APK](https://github.com/Zhuzhu-Jie/sonora-music/raw/refs/heads/main/downloads/sonora-1.0.0.apk)** · [打开下载文件页](https://github.com/Zhuzhu-Jie/sonora-music/blob/main/downloads/sonora-1.0.0.apk) · [查看 v1.0.0 发布说明](https://github.com/Zhuzhu-Jie/sonora-music/releases/tag/v1.0.0)
 
-本仓库为私有仓库。请先登录有权限的 GitHub 账号，在发布页的 **Assets** 中下载 **sonora-1.0.0.apk**（约 5.8 MiB），传到安卓手机打开安装。Release 标记为测试版；源码也可从仓库或发布页的 Source code 下载。
+本仓库为私有仓库。请先登录有权限的 GitHub 账号，再点击上面的 **下载安卓 APK**。如果直接下载不可用，请打开下载文件页，点击 **Download raw file / View raw**。文件约 5.8 MiB，传到安卓手机打开安装。APK 存放在仓库的 `downloads/` 目录，发布页提供下载入口和测试说明；源码也可从仓库或发布页的 Source code 下载。
 
 APK SHA-256：`cf88ae5b7cda88a5b1e402350c21e4d78bd6f94e8dd2acd4fe2e12e6c089ce8f`
 
@@ -23,7 +23,7 @@ APK SHA-256：`cf88ae5b7cda88a5b1e402350c21e4d78bd6f94e8dd2acd4fe2e12e6c089ce8f`
 
 ## 安装
 
-1. 将 `听见-1.0.0.apk` 保存到安卓手机并打开。最低 Android 8.0（API 26），建议使用已更新系统 WebView 的设备。
+1. 将 `sonora-1.0.0.apk` 保存到安卓手机并打开。最低 Android 8.0（API 26），建议使用已更新系统 WebView 的设备。
 2. 如系统提示，只为当前使用的浏览器或文件管理器临时允许“安装未知应用”，完成后可关闭此项。遵循系统安全扫描提示，无需关闭系统安全防护。
 3. 启动“听见 · 音乐学习”。所有课程、声音及工具均可离线使用。
 4. 首次音高训练时，点击“开始训练”，再授予麦克风权限。拒绝授权不影响其他功能。
