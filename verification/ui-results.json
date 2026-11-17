@@ -1,0 +1,21 @@
+{
+  "checks": [
+    "home and all 6 course units",
+    "quiz completion, next lesson, persisted text notes escaped",
+    "24 sound groups, category filter, actual WAV decoding/playback",
+    "browser preview does not pretend to measure microphone",
+    "native bridge UI contract: C4, cents, 100% score and saved summary",
+    "silence produces no fake pitch or training score",
+    "permission denial handled",
+    "complete 5-question ear training and score persistence",
+    "piano pointer capture, oscillator start and release",
+    "metronome starts, meter changes, stops on exit",
+    "profile shows real records, renders user notes as text",
+    "privacy accessible, reset cancellable and confirms deletion",
+    "no horizontal overflow at 320, 390, 768 and 1280 px",
+    "no uncaught JS errors and no external requests"
+  ],
+  "count": 14,
+  "errors": [],
+  "external_requests": []
+}
