@@ -28,6 +28,12 @@ public class PitchDetectorTest {
   check(d.detect(signal(440,.002,0,false))<0,"quiet signal");checks++;
   short[] dc=new short[N];java.util.Arrays.fill(dc,(short)1000);check(d.detect(dc)<0,"DC");checks++;
   Random r=new Random(31415);for(int k=0;k<10;k++){short[] noise=new short[N];for(int i=0;i<N;i++)noise[i]=(short)(r.nextGaussian()*3000);check(d.detect(noise)<0,"noise "+k);checks++;}
+  for(double hz:new double[]{82.4069,110,146.8324,196,246.9417,329.6276,261.6256,440,880}){
+   short[] hardware=new short[N*2],analysis=new short[N];
+   for(int i=0;i<hardware.length;i++)hardware[i]=(short)(.3*32767*Math.sin(2*Math.PI*hz*i/44100.0));
+   PitchDetector.prepareFrame(hardware,analysis);double result=d.detect(analysis);
+   check(result>0&&Math.abs(1200*Math.log(result/hz)/Math.log(2))<8,"hardware frame mapping "+hz);checks++;
+  }
   System.out.println("PASS: "+checks+" signal checks (pure, harmonics, detune, silence, quiet, DC, noise)");
  }
 }

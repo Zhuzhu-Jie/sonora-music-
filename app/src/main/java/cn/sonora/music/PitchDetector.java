@@ -6,6 +6,11 @@ public final class PitchDetector {
     private final double[] diff;
     public double confidence, rms;
     public PitchDetector(int rate, int size) { this.rate = rate; this.diff = new double[size / 2]; }
+    /** Average adjacent hardware samples: 44100 Hz -> 22050 Hz analysis frames. */
+    public static void prepareFrame(short[] hardware, short[] analysis) {
+        if (hardware.length != analysis.length * 2) throw new IllegalArgumentException("frame size");
+        for (int i=0; i<analysis.length; i++) analysis[i]=(short)(((int)hardware[i*2]+hardware[i*2+1])/2);
+    }
     public double detect(short[] input) {
         int half = Math.min(diff.length, input.length / 2);
         double mean = 0, energy = 0;

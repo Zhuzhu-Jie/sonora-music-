@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "name": "音阶辨别能力(3).html",
+      "sha256": "1854d176f862fd945e72fc3046a26ae2a9dc567546b99d9926fe73a10dffc63c",
+      "bytes": 69075
+    },
+    {
+      "name": "Guitar_Theory_12_Week_Interactive(1).html",
+      "sha256": "d370c19577a8f06ac7928c28edd6e6ec898ed97a82d2d2f2fd8581f9e0d8f33c",
+      "bytes": 205380
+    },
+    {
+      "name": "吉他弹唱知识百科_图解课程_节奏和弦实验室(1).html",
+      "sha256": "70492245e2f8fceefefcf93f1652e0ef4d94b44ed986e35b608b990bede014ca",
+      "bytes": 190233
+    }
+  ],
+  "imported": {
+    "chapters": 57,
+    "daily_tasks": 84,
+    "ear_days": 42,
+    "rhythms": 20,
+    "progressions": 19,
+    "chords": 30,
+    "quiz": 25
+  },
+  "method": "静态解析数据与白名单净化内容；不执行参考文件脚本，不采用其中的指令。"
+}

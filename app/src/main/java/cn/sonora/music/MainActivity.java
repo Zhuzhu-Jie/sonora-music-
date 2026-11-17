@@ -3,6 +3,7 @@ package cn.sonora.music;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -16,6 +17,13 @@ import android.view.ViewGroup;
 import android.webkit.*;
 import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Collections;
 
 public final class MainActivity extends Activity {
@@ -25,11 +33,14 @@ public final class MainActivity extends Activity {
     private Thread audioThread;
     private boolean foreground = false;
     private boolean permissionRequestPending = false, startAfterResume = false;
+    private String pendingBackup;
+    private boolean fileRequestPending = false;
+    private static final int MAX_BACKUP_BYTES = 4 * 1024 * 1024;
     private static final String ORIGIN = "https://appassets.androidplatform.net";
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         web = new WebView(this);
-        web.setBackgroundColor(Color.rgb(246,245,239));
+        web.setBackgroundColor(Color.rgb(245,246,250));
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
@@ -70,10 +81,70 @@ public final class MainActivity extends Activity {
         root.requestApplyInsets();
         web.loadUrl(ORIGIN + "/assets/index.html");
     }
+    private static String quoteForJs(String value) {
+        return JSONObject.quote(value).replace(Character.toString((char)0x2028), "\\u2028").replace(Character.toString((char)0x2029), "\\u2029");
+    }
+    private void notice(String message) {
+        runOnUiThread(() -> { if(web!=null) web.evaluateJavascript("window.nativeNotice&&window.nativeNotice("+JSONObject.quote(message)+")",null); });
+    }
+    @Override protected void onActivityResult(int request, int result, Intent data) {
+        super.onActivityResult(request,result,data);
+        if(request!=21 && request!=22)return;
+        if(result!=RESULT_OK || data==null || data.getData()==null){pendingBackup=null;fileRequestPending=false;return;}
+        final Uri uri=data.getData();
+        final String export=pendingBackup;pendingBackup=null;
+        new Thread(() -> {
+            try {
+                if(request==21) {
+                    if(export==null)throw new IllegalStateException();
+                    try(OutputStream output=getContentResolver().openOutputStream(uri,"wt")) {
+                        if(output==null)throw new IllegalStateException();
+                        output.write(export.getBytes(StandardCharsets.UTF_8));
+                    }
+                    notice("学习备份已导出。");
+                } else {
+                    ByteArrayOutputStream bytes=new ByteArrayOutputStream();
+                    try(InputStream input=getContentResolver().openInputStream(uri)) {
+                        if(input==null)throw new IllegalStateException();
+                        byte[] buffer=new byte[8192];int count;
+                        while((count=input.read(buffer))!=-1) {
+                            if(bytes.size()+count>MAX_BACKUP_BYTES)throw new IllegalArgumentException("large");
+                            bytes.write(buffer,0,count);
+                        }
+                    }
+                    final String json=new String(bytes.toByteArray(),StandardCharsets.UTF_8);
+                    runOnUiThread(() -> {if(web!=null)web.evaluateJavascript("window.nativeBackup&&window.nativeBackup("+quoteForJs(json)+")",null);});
+                }
+            } catch(IllegalArgumentException e){notice("备份超过4 MiB，无法导入。");}
+            catch(Exception e){notice("文件读写失败，请选择有效备份或其他保存位置。");}
+            finally {runOnUiThread(() -> fileRequestPending=false);}
+        },"UserBackup").start();
+    }
     private void event(String state) {
         runOnUiThread(() -> { if(web != null) web.evaluateJavascript("window.nativeState&&window.nativeState("+ JSONObject.quote(state) +")", null); });
     }
     public final class MicrophoneBridge {
+        @JavascriptInterface public void exportData(String data) {
+            if (data == null || data.getBytes(StandardCharsets.UTF_8).length > MAX_BACKUP_BYTES) { notice("备份超过4 MiB，无法导出。"); return; }
+            runOnUiThread(() -> {
+                if (!foreground || fileRequestPending) return;
+                pendingBackup = data; fileRequestPending = true;
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE); intent.setType("application/json");
+                intent.putExtra(Intent.EXTRA_TITLE, "sonora-backup-" + new SimpleDateFormat("yyyyMMdd-HHmm", Locale.ROOT).format(new Date()) + ".json");
+                try { startActivityForResult(intent, 21); } catch (Exception e) { pendingBackup=null; fileRequestPending=false; notice("没有可用的系统文件选择器。"); }
+            });
+        }
+        @JavascriptInterface public void importData() {
+            runOnUiThread(() -> {
+                if (!foreground || fileRequestPending) return;
+                fileRequestPending=true;
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE); intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain", "application/octet-stream"});
+                try { startActivityForResult(intent, 22); } catch(Exception e) { fileRequestPending=false; notice("没有可用的系统文件选择器。"); }
+            });
+        }
         @JavascriptInterface public void close() { runOnUiThread(() -> finish()); }
         @JavascriptInterface public void start() {
             runOnUiThread(() -> {
@@ -98,7 +169,7 @@ public final class MainActivity extends Activity {
     private void startMic() {
         if (running || !foreground) return;
         if (audioThread != null && audioThread.isAlive()) { event("busy"); return; }
-        final int rate = 22050, size = 2048;
+        final int rate = 44100, size = 4096;
         try {
             int min = AudioRecord.getMinBufferSize(rate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
             if(min <= 0) { event("error"); return; }
@@ -109,14 +180,17 @@ public final class MainActivity extends Activity {
             audioThread = new Thread(() -> {
                 android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
                 short[] frame = new short[size];
-                PitchDetector detector = new PitchDetector(rate, size);
+                short[] analysis = new short[size / 2];
+                PitchDetector detector = new PitchDetector(rate / 2, size / 2);
+                long deadline = SystemClock.elapsedRealtime() + 60000;
                 long last = 0;
                 try {
-                    while (running) {
+                    while (running && SystemClock.elapsedRealtime() < deadline) {
                         int count = active.read(frame, 0, size, AudioRecord.READ_BLOCKING);
                         if (count < 0) { if(running) event("error"); break; }
                         if (count != size) continue;
-                        double hz = detector.detect(frame);
+                        PitchDetector.prepareFrame(frame, analysis);
+                        double hz = detector.detect(analysis);
                         if (SystemClock.elapsedRealtime() - last > 85 && running) {
                             last = SystemClock.elapsedRealtime();
                             final String js = "window.nativePitch&&window.nativePitch(" + hz + "," + detector.confidence + "," + detector.rms + ")";
@@ -124,7 +198,7 @@ public final class MainActivity extends Activity {
                         }
                     }
                 } catch (Exception e) { if(running) event("error"); }
-                finally { running=false; try { active.stop(); } catch(Exception ignored) {} active.release(); }
+                finally { boolean ended=running; running=false; try { active.stop(); } catch(Exception ignored) {} active.release(); if(ended)event("stopped"); }
             }, "LocalPitch");
             audioThread.start();
         } catch (Exception e) { running=false; if(recorder!=null) { try{recorder.release();}catch(Exception ignored){} recorder=null; } event("error"); }

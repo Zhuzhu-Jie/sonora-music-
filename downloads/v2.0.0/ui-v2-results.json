@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "new home and 5 mobile destinations, real empty stats",
+    "57 searchable chapters, persisted notes and actual 84-day plan records",
+    "42-day hearing and 14-day singing routes",
+    "v1 notes retained, user note HTML rendered as text",
+    "all 8 training modes play real audio where needed and grade answers correctly",
+    "wrong-question capture and exact-sound review require two correct attempts",
+    "78 fret positions, transposed scale highlights, 30 chord shapes and fifth-omission explanation",
+    "19 harmonic routes, borrowed minor preserved after transposition, loop stops on exit",
+    "20 patterns including 6/8; interrupted tap exercise creates no fake score",
+    "custom arrangement, capo calculation, saved song cards, unscored accompaniment and safe user text",
+    "completed timed tap round records real zero hits when no taps are made",
+    "fret finding scores actual positions; metronome, keyboard and unscored chord changes operate",
+    "native bridge display, silence rejection, cents scoring, stable multi-note steps and stop on exit",
+    "JSON export, schema validation, import preview and explicit replacement",
+    "all 5 sections fit 320,390,768,1280 pixel layouts",
+    "no uncaught JS errors or external network requests"
+  ],
+  "count": 16,
+  "errors": [],
+  "external_requests": []
+}

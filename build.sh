@@ -40,8 +40,8 @@ PY
  keytool -genkeypair -keystore .local-signing/release.jks -storepass:file .local-signing/password -keypass:file .local-signing/password -alias sonora -keyalg RSA -keysize 3072 -validity 10000 -dname 'CN=Sonora Offline Music, OU=Independent Build' >/dev/null 2>&1
  chmod 600 .local-signing/release.jks
 fi
-"$SDK_TOOLS/apksigner" sign --ks .local-signing/release.jks --ks-pass file:.local-signing/password --ks-key-alias sonora --out build/sonora-1.0.0.apk build/aligned.apk
-"$SDK_TOOLS/apksigner" verify --verbose --print-certs build/sonora-1.0.0.apk > build/signature.txt
-"$SDK_TOOLS/aapt" dump badging build/sonora-1.0.0.apk > build/package.txt
-sha256sum build/sonora-1.0.0.apk > build/SHA256SUMS
+"$SDK_TOOLS/apksigner" sign --ks .local-signing/release.jks --ks-pass file:.local-signing/password --ks-key-alias sonora --out build/sonora-2.0.0.apk build/aligned.apk
+"$SDK_TOOLS/apksigner" verify --verbose --print-certs build/sonora-2.0.0.apk > build/signature.txt
+"$SDK_TOOLS/aapt" dump badging build/sonora-2.0.0.apk > build/package.txt
+sha256sum build/sonora-2.0.0.apk > build/SHA256SUMS
 cat build/SHA256SUMS
